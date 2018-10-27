@@ -4,13 +4,11 @@ Notes
 Todo
 ----
 
-*   Write curl script to save URLs of images to a file
-*   Write python script to extract URLs and collect
-*   Write wget/curl script to download images
-*   Write code to process images: convert to greyscale
+*   Write code to process images: convert to greyscale, reduce
+    size/dimensionality
 *   Figure out API to get historical weather data
-*   Write script to get weather data correpsonding to images;
-    only need a binary variable 'raining' vs. 'not raining' I think
+*   Write script to get weather data correpsonding to time of images;
+    we only need a binary variable 'raining' vs. 'not raining' I think
 *   Figure out which algorithm to use to train the model;
     Convolutional NN?
 *   Find library to implement training algorithm, etc.
@@ -20,6 +18,9 @@ Done
 *   Is there a weather station near Times Square?
     Should I pick a different camera location?
     Central Park station and Midtown camera are good.
+*   Write curl script to save URLs of images to a file
+*   Write python script to extract URLs and collect
+*   Write wget/curl script to download images
 
 
 

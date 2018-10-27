@@ -9,9 +9,10 @@ def main(argv):
     outdir = jsondir
 
     image_list = list()
-    for i in range(50):
-        with open(os.path.join(jsondir, 'urls-%s.json' % i), 'r') as f:
-            json_str = f.read()
+    with open(os.path.join(jsondir, 'response.txt'), 'r') as f:
+        json_list = f.read().splitlines()
+    # NOTE: This is a list of valid JSON strings
+    for json_str in json_list:
         response = json.loads(json_str[3:])  # remove Byte Order Mark
         for image in response['hofdata']:
             image_list.append(image)
