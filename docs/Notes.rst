@@ -4,17 +4,20 @@ Notes
 Todo
 ----
 
-*   Write code to process images: convert to greyscale, reduce
-    size/dimensionality
-*   Figure out API to get historical weather data
-*   Write script to get weather data correpsonding to time of images;
-    we only need a binary variable 'raining' vs. 'not raining' I think
+*   Collect times of images. For each, find the nearest
+    observation and record the Raining/Not binary variable.
+    This variable could be added to the 'images.csv' file.
 *   Figure out which algorithm to use to train the model;
     Convolutional NN?
 *   Find library to implement training algorithm, etc.
+*   Write code to process images: convert to greyscale, reduce
+    size/dimensionality
 
 Done
 ----
+*   Figure out API to get historical weather data
+*   Write script to get weather data correpsonding to time of images;
+    we only need a binary variable 'raining' vs. 'not raining' I think
 *   Is there a weather station near Times Square?
     Should I pick a different camera location?
     Central Park station and Midtown camera are good.
@@ -30,8 +33,27 @@ NWS API and Data
 Historical Data
 ```````````````
 
+Promising:
+
+*   `Environmental Web Services
+    <https://www.ncdc.noaa.gov/cdo-web/webservices/ncdcwebservices>`__:
+    requires token [vbuLRFzLHqYPeHGCfCMgSLuuNoUodnhw].
+    This data is provided by the National Center for Environmental
+    Information (formerly the National Climatic Data Center, NCDC).
+    This is part of the NOAA.
+    The 15-minute and hourly percipitation reports are only
+    available through 2014, it seem.
+*   `Local Climatological Data
+    <https://www.ncdc.noaa.gov/cdo-web/datasets/LCD/stations/WBAN:94728/detail.`__
+    The LCD data is provided in PDF or CSV.
+*   `National Weather Service Forecast Office observations
+    <https://w2.weather.gov/climate/index.php?wfo=okx>`__.
+    This provides current observations, but not past observations
+    in hourly detail.
+    
+
 The NWS is part of the NOAA. They have an `API portal
-<https://graphical.weather.gov/xml/>`__.
+<https://graphical.weather.gov/xml/>`__ for **forecast** data.
 
 NOAA publishes `data
 <https://www.ncdc.noaa.gov/data-access/land-based-station-data/data-publications>`__.
@@ -54,19 +76,29 @@ Here is `another station list
 
 There is also a `KML map
 <https://www.weather.gov/ctwp/stationsmap>`__.
-Here is a `map of radio stations <http://www.nws.noaa.gov/nwr/Maps/`__.
+Here is a `map of radio stations
+<http://www.nws.noaa.gov/nwr/Maps/>`__.
 
 `KNYC <https://w1.weather.gov/obhistory/KNYC.html>`__ is located
-in Central Park.
+in Central Park. Here is the station's `metadata
+<https://www.ncdc.noaa.gov/homr/#ncdcstnid=20019453&tab=MSHR>`__.
+
+*   COOP ID: 305801
+*   ICAO ID: KNYC
+*   WBAN ID: 94728
+*   FAA ID: NYC
+*   NCDC ID: 20019453
 
 Here is a `tool for finding observation stations
 <https://www.ncdc.noaa.gov/cdo-web/datatools/findstation>`__.
 
+
 Station to Use
 ``````````````
 
-KNYC is at (40.783, -73.967). It is at
-`Belvedere Castle
+KNYC is at (40.783, -73.967) or (40.77898°, -73.96925°), per
+another source.
+It is at `Belvedere Castle
 <https://en.wikipedia.org/wiki/Belvedere_Castle>`__, which Google
 Maps gives as (40.7794302, -73.9712617). This is about 1.8 miles
 northeast of Times Square.
@@ -106,6 +138,7 @@ Cameras
 ```````
 
 These are all fairly stationary and include sky and water:
+
 *   `NYC Skyline from Jersey City Hyatt Regency
     <https://www.earthcam.com/usa/newyork/skyline/?cam=hyatthd>`__
 *   `NYC Skyline from ???
