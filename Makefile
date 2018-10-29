@@ -1,8 +1,11 @@
-urls.json:
+data/raw/response.txt:
 	sh src/data/request_urls.sh
 
-images.csv combined_urls.txt: urls.json
-	py src/data/extract_urls.py src/data
+data/raw/images.csv data/raw/combined_urls.txt: data/raw/response.txt
+	python src/data/extract_urls.py src/data
 
-images:
+images:  # image files
 	sh src/data/download_images.sh
+
+data/interim/images.csv: data/raw/images.csv
+	python src/data/add_labels.py data/raw data/interim
