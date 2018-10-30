@@ -1,6 +1,7 @@
 import pandas as pd
 from datetime import datetime
 import time
+import pytz
 import os
 import sys
 import pdb
@@ -14,27 +15,28 @@ def main(argv):
     reports = pd.read_csv(os.path.join(datapath, 'NCDC-CDO-LCD.csv'))
     reports['unix_time'] = reports['DATE'].apply(parse_date)
 
-    pdb.set_trace()
     for i in images.index:
         image_time = images.ix[i]['date_added']
-        # utcfromtimestamp assumes I am in CST ?
-        image_time = datetime.utcfromtimestamp(image_time)
+        # Datetime object is "offset-naive," but UTC is implicit
+        # image_time = datetime.utcfromtimestamp(image_time)
+        pdb.set_trace()
 
-        # TODO: convert to EST
-        # TODO: look up closest time in reports
+        # TODO: look up closest time in reports['unix_time']
         # TODO: parse report codes and determine if raining
         # TODO: add raininglabel to images df
-
         
     
     # Write out
     images.to_csv(os.path.join(outpath, 'images.csv'), index=False)
 
 def parse_date(string):
-    # https://docs.python.org/2/library/datetime.html#strftime-strptime-behavior
     dt = datetime.strptime(string, '%Y-%m-%d %H:%M')
-    # mktime assumes datetime object is in UTC??
-    unix_time = int(time.mktime(dt.timetuple()))
+    # Set timezone to make "offset-aware"
+    # The weather data is always in EST, ignoring DST
+    dt = dt.replace(tzinfo=pytz.timezone('EST'))
+    # Time zero of Unix epoch, with timezone information added
+    time_zero = datetime(1970, 1, 1).replace(tzinfo=pytz.timezone('UTC'))
+    unix_time = int((dt - time_zero).total_seconds())
     return unix_time
 
 if __name__ == '__main__':
