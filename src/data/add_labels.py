@@ -3,6 +3,7 @@ import numpy as np
 from datetime import datetime
 import time
 import pytz
+import re
 import os
 import sys
 import pdb
@@ -29,44 +30,28 @@ def main(argv):
     reports.sort_values(by='unix_time', inplace=True)
     reports.reset_index(drop=True, inplace=True)
 
-    # Linear search
-#    for i in images.index:
-#        for j in reports.index:
-#            # Advance until <1 hour PAST an observation
-#            diff = images.ix[i]['date_added'] - reports.ix[j]['unix_time']
-#            if 0 < diff and diff < 3600:
-#                # Choose closest of two surrounding observations
-#                if diff <= 1800:
-#                    rain_label = parse_label(reports.ix[j])
-#                else:
-#                    rain_label = parse_label(reports.ix[j + 1])
-#                images.at[i, 'is_raining'] = rain_label
-#                break
-#            else:
-#                pass
-
     # Binary search
     for i in images.index:
-        image_time = images.ix[i]['date_added']
+        image_time = images.loc[i]['date_added']
         m = binary_search(image_time, reports['unix_time'])
         if m == -1:
             # No close observation in weather reports
             break
-        report_time = reports.ix[m]['unix_time']
+        report_time = reports.loc[m]['unix_time']
         diff = image_time - report_time
         if diff > 1800:
             # choose m + 1
-            rain_label = parse_label(reports.ix[m + 1])
+            observation = reports.loc[m + 1]['HOURLYPRSENTWEATHERTYPE']
         elif diff < -1800:
             # choose m - 1
-            rain_label = parse_label(reports.ix[m - 1])
+            observation = reports.loc[m - 1]['HOURLYPRSENTWEATHERTYPE']
         else:
             # choose m
-            rain_label = parse_label(reports.ix[m])
-        images.at[i, 'is_raining'] = rain_label
+            observation = reports.loc[m]['HOURLYPRSENTWEATHERTYPE']
+        images.at[i, 'rain'] = parse_label(observation)
 
-    # Drop images without label and write out
-    images = images[images['is_raining'].notna()]
+    # Drop images without label; write out data
+    images = images[images['rain'].notna()]
     images.to_csv(os.path.join(outpath, 'images.csv'), index=False)
 
 # For reference, see:
@@ -81,17 +66,28 @@ def binary_search(value, series):
     # return binary_search(value, series[L:R+1])
     while L <= R:
         m = (L + R) / 2  # since integers, returns floor
-        if 3600 < value - series.ix[m]:
+        if 3600 < value - series.loc[m]:
             L = m + 1
-        elif -3600 > value - series.ix[m]:
+        elif -3600 > value - series.loc[m]:
             R = m - 1
         else:
-            return m  # value within +/- 3600 of series.ix[m]
+            return m  # value within +/- 3600 of series.loc[m]
     return -1  # value not found
 
-def parse_label(record):
-    # TODO: parse record to determine raining label
-    return False
+def parse_label(observation):
+    # Parse observations for indicators of rain
+    if type(observation) is not str:
+        return 0  # no observation
+    try:
+        AU, AW, MW = observation.split('|')
+    except:
+        print("Observation is malformed")
+    AU_re = re.search(r'RA:02', AU)
+    AW_re = re.search(r'RA:6\d', AW)
+    if AU_re or AW_re:
+        return 1  # rain was observed
+    else:
+        return 0  # rain was not observed
 
 def parse_date(string):
     dt = datetime.strptime(string, '%Y-%m-%d %H:%M')

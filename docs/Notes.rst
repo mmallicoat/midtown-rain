@@ -4,9 +4,6 @@ Notes
 Todo
 ----
 
-*   Collect times of images. For each, find the nearest
-    observation and record the Raining/Not binary variable.
-    This variable could be added to the 'images.csv' file.
 *   Figure out which algorithm to use to train the model;
     Convolutional NN?
 *   Find library to implement training algorithm, etc.
@@ -15,6 +12,9 @@ Todo
 
 Done
 ----
+*   Collect times of images. For each, find the nearest
+    observation and record the Raining/Not binary variable.
+    This variable could be added to the 'images.csv' file.
 *   Figure out API to get historical weather data
 *   Write script to get weather data correpsonding to time of images;
     we only need a binary variable 'raining' vs. 'not raining' I think
@@ -30,6 +30,144 @@ Done
 NWS API and Data
 ----------------
 
+LCD Hourly Weather Type
+```````````````````````
+
+From documentation:
+
+    **Weather Type (AU|AW|MW):** Weather types describe precipitation or
+    obstructions to vision occurring at the time of observation. These
+    are reported by automated sensors (AU or AW) and manually (MW) by
+    human observation. AU elements are listed first and followed by
+    “|” and followed by AW elements. After the AW elements there will
+    be another “|” followed by the MW elements (e.g.
+    “-RA:02|RA:61|RA:61”). In the preceding example -RA:02 is an AU
+    element, RA:61 is an AW element and RA:61 is an MW element. Note
+    that precipitation types often use “-“ for light intensity or “+”
+    for heavy intensity. If a precipitation type has no “-“ or “+” it
+    is considered to be moderate intensity. It is not uncommon for one
+    type of element to be reported without another. In other words, it
+    is possible to have an AU element without an AW element or MW
+    element. Definitions of contractions used are listed in the
+    Present Weather Appendix at the end of this document.
+
+Record schema: [AU]|[AW]|[MW]
+
+Observation schema: RA:[code]
+
+Codes for rain:
+
+-   AU
+
+    *   DZ:01 - Drizzle
+    *   RA:02 - Rain
+
+-   AW
+
+    *   21 - Precipitation (during preceding hour but not at time of
+        observation)
+    *   22 - Drizzle (not freezing) or snow grains (during preceding hour
+        but not at time of observation)
+    *   23 - Rain (not freezing) (during preceding hour but not at time of
+        observation)
+    *   25 - Freezing drizzle or freezing rain (during preceding hour but
+        not at time of observation)
+    *   40 - Precipitation
+    *   41 - Precipitation, slight or moderate
+    *   42 - Precipitation, heavy
+    *   43 - Liquid precipitation, slight or moderate
+    *   44 - Liquid precipitation, heavy
+    *   45 - Solid precipitation, slight or moderate
+    *   46 - Solid precipitation, heavy
+    *   47 - Freezing precipitation, slight or moderate
+    *   48 - Freezing precipitation, heavy
+    *   DZ:50 - Drizzle
+    *   DZ:51 - Drizzle, not freezing, slight
+    *   DZ:52 - Drizzle, not freezing, moderate
+    *   DZ:53 - Drizzle, not freezing, heavy
+    *   FZDZ:54 - Drizzle, freezing, slight
+    *   FZDZ:55 - Drizzle, freezing, moderate
+    *   FZDZ:56 - Drizzle, freezing, heavy
+    *   DZ:57 - Drizzle and rain, slight
+    *   DZ:58 - Drizzle and rain, moderate or heavy
+    *   RA:60 - Rain
+    *   RA:61 - Rain, not freezing, slight
+    *   RA:62 - Rain, not freezing, moderate
+    *   RA:63 - Rain, not freezing, heavy
+    *   FZRA:64 - Rain, freezing, slight
+    *   FZRA:65 - Rain, freezing, moderate
+    *   FZRA:66 - Rain, freezing, heavy
+    *   RA:67 - Rain or drizzle and snow, slight
+    *   RA:68 - Rain or drizzle and snow, moderate or heavy
+    *   SHRA:81 - Rain showers or intermittent rain, slight
+    *   SHRA:82 - Rain showers or intermittent rain, moderate
+    *   SHRA:83 - Rain showers or intermittent rain, heavy
+    *   SHRA:84 - Rain showers or intermittent rain, violent
+    *   SHSN:85 - Snow showers or intermittent snow, slight
+    *   SHSN:86 - Snow showers or intermittent snow, moderate
+    *   SHSN:87 - Snow showers or intermittent snow, heavy
+    *   TS:92 - Thunderstorm, slight or moderate, with rain showers and/or
+        snow showers
+    *   TS:95 - Thunderstorm, heavy, with rain showers and/or snow
+    
+-   MW
+
+    *   25 - Shower(s) of rain (during the preceding hour but not at the
+        time of observation)
+    *   DZ:50 - Drizzle, not freezing, intermittent, slight at time of
+        observation
+    *   DZ:51 - Drizzle, not freezing, continuous, slight at time of
+        observation
+    *   DZ:52 - Drizzle, not freezing, intermittent, moderate at time of
+        observation
+    *   DZ:53 - Drizzle, not freezing, continuous, moderate at time of
+        observation
+    *   DZ:54 - Drizzle, not freezing, intermittent, heavy (dense) at time
+        of observation
+    *   DZ:55 - Drizzle, not freezing, continuous, heavy (dense) at time
+        of observation
+    *   FZDZ:56 - Drizzle, freezing, slight
+    *   FZDZ:57 - Drizzle, freezing, moderate or heavy (dense)
+    *   DZ:58 - Drizzle and rain, slight
+    *   DZ:59 - Drizzle and rain, moderate or heavy
+    *   RA:60 - Rain, not freezing, intermittent, slight at time of
+        observation
+    *   RA:61 - Rain, not freezing, continuous, slight at time of
+        observation
+    *   RA:62 - Rain, not freezing, intermittent, moderate at time of
+        observation
+    *   RA:63 - Rain, not freezing, continuous, moderate at time of
+        observation
+    *   RA:64 - Rain, not freezing, intermittent, heavy at time of
+        observation
+    *   RA:65 - Rain, not freezing, continuous, heavy at time of
+        observation
+    *   FZRA:66 - Rain, freezing, slight
+    *   FZRA:67 - Rain, freezing, moderate or heavy
+    *   RA:68 - Rain or drizzle and snow, slight
+    *   RA:69 - Rain or drizzle and snow, moderate or heavy
+    *   SHRA:80 - Rain shower(s), slight
+    *   SHRA:81 - Rain shower(s), moderate or heavy
+    *   SHRA:82 - Rain shower(s), violent
+    *   RA:91 - Slight rain at time of observation, thunderstorm during
+        the preceding hour but not at time of observation
+    *   RA:92 - Moderate or heavy rain at time of observation,
+        thunderstorm during the preceding hour but not at time of
+        observation
+
+Glossary:
+
+*   +: high intensity, rather than moderate
+*   -: low intensity, rather than moderate
+*   AU: report by automatic sensor
+*   AW: report by automatic sensor
+*   MW: report by human observation
+
+
+
+
+
+
 Historical Data
 ```````````````
 
@@ -44,7 +182,7 @@ Promising:
     The 15-minute and hourly percipitation reports are only
     available through 2014, it seem.
 *   `Local Climatological Data
-    <https://www.ncdc.noaa.gov/cdo-web/datasets/LCD/stations/WBAN:94728/detail.`__
+    <https://www.ncdc.noaa.gov/cdo-web/datasets/LCD/stations/WBAN:94728/detail>`__
     The LCD data is provided in PDF or CSV.
 *   `National Weather Service Forecast Office observations
     <https://w2.weather.gov/climate/index.php?wfo=okx>`__.
