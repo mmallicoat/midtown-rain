@@ -7,6 +7,7 @@ Todo
 *   Figure out which algorithm to use to train the model;
     Convolutional NN?
 *   Find library to implement training algorithm, etc.
+    PyTorch? TensorFlow?
 *   Write code to process images: convert to greyscale, reduce
     size/dimensionality
 
@@ -26,6 +27,14 @@ Done
 *   Write wget/curl script to download images
 
 
+
+References
+----------
+
+*   `Image classification
+    <http://www.coldvision.io/2016/07/29/image-classification-deep-learning-cnn-caffe-opencv-3-x-cuda/>`__
+*   `TensorFlow Keras documentation <https://www.tensorflow.org/guide/keras>`__
+*   `TensorFlow docs for CNN <https://www.tensorflow.org/tutorials/estimators/cnn>`__
 
 NWS API and Data
 ----------------
