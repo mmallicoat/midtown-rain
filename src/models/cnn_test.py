@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import pdb
-
+import os
 
 # https://www.tensorflow.org/tutorials/estimators/cnn
 
@@ -9,6 +9,14 @@ def main():
     # Load training and eval data
     ((train_data, train_labels),
      (eval_data, eval_labels)) = tf.keras.datasets.mnist.load_data()
+
+    data_dir = '/Users/user/Code/midtown-rain/data/raw'
+    filename = '1521024840348_52.jpg'
+    from PIL import Image
+    # open as grayscale
+    img = Image.open(os.path.join(data_dir, filename)).convert('L')
+    arr = np.array(img)
+    pdb.set_trace()
     
     train_data = train_data/np.float32(255)
     train_labels = train_labels.astype(np.int32)  # not required
