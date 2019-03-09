@@ -7,22 +7,24 @@ import os
 
 def main():
     # Load training and eval data
-    ((train_data, train_labels),
-     (eval_data, eval_labels)) = tf.keras.datasets.mnist.load_data()
+#    ((train_data, train_labels),
+#     (eval_data, eval_labels)) = tf.keras.datasets.mnist.load_data()
 
-    data_dir = '/Users/user/Code/midtown-rain/data/raw'
-    filename = '1521024840348_52.jpg'
-    from PIL import Image
-    # open as grayscale
-    img = Image.open(os.path.join(data_dir, filename)).convert('L')
-    arr = np.array(img)
-    pdb.set_trace()
+    data_dir = '/Users/user/Code/midtown-rain/data/processed'
+    train_data = np.load(os.path.join(data_dir, 'train_data.pkl'))
+    train_labels = np.load(os.path.join(data_dir, 'train_labels.pkl'))
+    eval_data = np.load(os.path.join(data_dir, 'cv_data.pkl'))
+    eval_labels = np.load(os.path.join(data_dir, 'cv_labels.pkl'))
+
+    # TODO: need to rehsape labels to be a Series?
+    train_labels = train_labels.astype(np.int32)
+    eval_labels = eval_labels.astype(np.int32)
     
     train_data = train_data/np.float32(255)
-    train_labels = train_labels.astype(np.int32)  # not required
+#    train_labels = train_labels.astype(np.int32)  # not required
     
     eval_data = eval_data/np.float32(255)
-    eval_labels = eval_labels.astype(np.int32)  # not required
+#    eval_labels = eval_labels.astype(np.int32)  # not required
 
     # Create the Estimator
     mnist_classifier = tf.estimator.Estimator(
@@ -64,13 +66,15 @@ def main():
 def cnn_model_fn(features, labels, mode):
   """Model function for CNN."""
   # Input Layer
-  input_layer = tf.reshape(features["x"], [-1, 28, 28, 1])
+  # Set arguments for dimensions of the images (rows x cols)
+  input_layer = tf.reshape(features["x"], [-1, 540, 960, 1])
 
   # Convolutional Layer #1
+  # Specifies the convolutions over the 540x960 tensor
   conv1 = tf.layers.conv2d(
       inputs=input_layer,
-      filters=32,
-      kernel_size=[5, 5],
+      filters=60 * 60,
+      kernel_size=[9, 16],
       padding="same",
       activation=tf.nn.relu)
 
@@ -78,16 +82,17 @@ def cnn_model_fn(features, labels, mode):
   pool1 = tf.layers.max_pooling2d(inputs=conv1, pool_size=[2, 2], strides=2)
 
   # Convolutional Layer #2 and Pooling Layer #2
+  # Specifies the filters with ReLU activation
   conv2 = tf.layers.conv2d(
       inputs=pool1,
-      filters=64,
-      kernel_size=[5, 5],
+      filters=60 * 60,
+      kernel_size=[9, 16],
       padding="same",
       activation=tf.nn.relu)
   pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=[2, 2], strides=2)
 
   # Dense Layer
-  pool2_flat = tf.reshape(pool2, [-1, 7 * 7 * 64])
+  pool2_flat = tf.reshape(pool2, [-1, 225 * 540 * 960])  # magic dimensions
   dense = tf.layers.dense(inputs=pool2_flat, units=1024, activation=tf.nn.relu)
   dropout = tf.layers.dropout(
       inputs=dense, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
