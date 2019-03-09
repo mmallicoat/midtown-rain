@@ -4,6 +4,7 @@ Notes
 Todo
 ----
 
+*   Prepare image data: get into a 3D numpy array
 *   Figure out which algorithm to use to train the model;
     Convolutional NN?
 *   Find library to implement training algorithm, etc.
@@ -35,6 +36,7 @@ References
     <http://www.coldvision.io/2016/07/29/image-classification-deep-learning-cnn-caffe-opencv-3-x-cuda/>`__
 *   `TensorFlow Keras documentation <https://www.tensorflow.org/guide/keras>`__
 *   `TensorFlow docs for CNN <https://www.tensorflow.org/tutorials/estimators/cnn>`__
+*   `Pillow docs <https://pillow.readthedocs.io/en/stable/>`__
 
 NWS API and Data
 ----------------

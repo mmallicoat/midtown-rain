@@ -1,50 +1,43 @@
 from PIL import Image
 import numpy as np
 import pandas as pd
+import pickle
 import os
 import pdb
 
 # Convert images to grayscale and output as 3D array
 def main():
 
-    image_dir = '/Users/user/Code/midtown-rain/data/raw'
-    manifest_dir = '/Users/user/Code/midtown-rain/data/interim'
+    raw_dir = '/Users/user/Code/midtown-rain/data/raw'
+    interim_dir = '/Users/user/Code/midtown-rain/data/interim'
 
-    manifest = pd.read_csv(os.path.join(manifest_dir, 'images.csv'))
+    manifest = pd.read_csv(os.path.join(interim_dir, 'images.csv'))
     get_filename = lambda x: os.path.basename(x)
     filenames = manifest['image_path'].apply(get_filename)
     labels = manifest['rain']
 
+    print("Process images...")
     image_list = list()
-    for filename in filenames[1:10]:
-        # Open as grayscale
-        img = Image.open(os.path.join(image_dir, filename)).convert('L')
-        arr = np.array(img)
-        # Pad to common dimensions with black pixels
-        height, width = arr.shape  # rows, columns
-        if width != 960:
-            col = np.zeros((height, 960 - width))
-            arr = np.concatenate((arr, row), axis=1)
-        if height != 540:
-            row = np.zeros((540 - height, 960))
-            arr = np.concatenate((arr, row), axis=0)
-        # Add as array to image list
+    for filename in filenames:
+        # Convert to grayscale
+        img = Image.open(os.path.join(raw_dir, filename)).convert('L')
+        # Resize images to default size
+        width, height = (960, 540)
+        if img.size != (width, height):
+            img = img.resize((width, height))
+        # image bitmap has 8-bit color; use this to minimize size
+        arr = np.array(img, dtype='int8')
         image_list.append(arr)
 
+    print("Compile images...")
     train_data = np.stack(image_list)
-    # save to pickle file
+    print("Save images to disk...")
+    # Save images to pickle file
+    with open(os.path.join(interim_dir, 'images.pkl'), 'w') as f:
+        # Using pickle.dump causes bug, due to large size of array
+        # pickle.dump(train_data, f, protocol=2)
+        np.save(f, train_data, allow_pickle=True)
+    print("Done.")
 
 if __name__ == '__main__':
     main()
-
-#        # Crop to common dimensions
-#        width, height = img.size   # Get dimensions
-#        if height != 540:
-#            # White is 255; black is 0
-#            pdb.set_trace()
-#            left = 0
-#            top = 0
-#            right = 3 * width/4
-#            bottom = 3 * height/4
-#            # TODO
-#            img.crop((left, top, right, bottom))
