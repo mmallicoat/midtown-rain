@@ -4,16 +4,12 @@ Notes
 Todo
 ----
 
-*   Prepare image data: get into a 3D numpy array
-*   Figure out which algorithm to use to train the model;
-    Convolutional NN?
-*   Find library to implement training algorithm, etc.
-    PyTorch? TensorFlow?
-*   Write code to process images: convert to greyscale, reduce
-    size/dimensionality
 
 Done
 ----
+*   Write code to process images: convert to greyscale, reduce
+    size/dimensionality
+*   Prepare image data: get into a 3D numpy array
 *   Collect times of images. For each, find the nearest
     observation and record the Raining/Not binary variable.
     This variable could be added to the 'images.csv' file.
@@ -27,7 +23,14 @@ Done
 *   Write python script to extract URLs and collect
 *   Write wget/curl script to download images
 
+Specific References
+-------------------
 
+`Downsampling <https://ai.stackexchange.com/questions/3938/how-to-handle-images-of-large-sizes-in-cnn>`__
+
+`Stride <https://www.quora.com/How-does-one-determine-stride-size-in-CNN-filters>`__
+
+`Loss function <https://stackoverflow.com/questions/47034888/how-to-choose-cross-entropy-loss-in-tensorflow>`__
 
 References
 ----------
