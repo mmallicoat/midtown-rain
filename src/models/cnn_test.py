@@ -85,7 +85,6 @@ def cnn_model_fn(features, labels, mode):
   # Convolutional Layer #1
   # Specifies the convolutions over the 540x960 tensor
   conv1 = tf.layers.conv2d(
-  # conv1 = tf.keras.layers.Conv2D(
       inputs=input_layer,
       filters=CN1,  # number of nodes in layer
       kernel_size=KS1,  # dims of filter
@@ -95,12 +94,10 @@ def cnn_model_fn(features, labels, mode):
 
   # Pooling Layer #1
   pool1 = tf.layers.max_pooling2d(inputs=conv1, pool_size=POOL_SIZE, strides=POOL_STRIDE)
-  # pool1 = tf.keras.layers.Max_pooling2d(inputs=conv1, pool_size=POOL_SIZE, strides=POOL_STRIDE)
 
   # Convolutional Layer #2 and Pooling Layer #2
   # Specifies the filters with ReLU activation
   conv2 = tf.layers.conv2d(
-  # conv2 = tf.keras.layers.Conv2D(
       inputs=pool1,
       filters=CN2,
       kernel_size=KS2,
@@ -110,15 +107,12 @@ def cnn_model_fn(features, labels, mode):
 
   # Pooling Layer #2
   pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=POOL_SIZE, strides=POOL_STRIDE)
-  # pool2 = keras.layers.max_pooling2d(inputs=conv2, pool_size=POOL_SIZE, strides=POOL_STRIDE)
 
   # Dense Layer
   feature_count = (IMG_HT / S1 / POOL_STRIDE ** 2) * (IMG_WD / S1 / POOL_STRIDE ** 2) * CN2
   pool2_flat = tf.reshape(pool2, [-1, feature_count])
   dense = tf.layers.dense(inputs=pool2_flat, units=DN, activation=tf.nn.relu)
-#  dense = tf.keras.layers.dense(inputs=pool2_flat, units=DN, activation=tf.nn.relu)
   dropout = tf.layers.dropout(
-#  dropout = tf.keras.layers.dropout(
       inputs=dense, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
 
   # Logits Layer for binary classification
